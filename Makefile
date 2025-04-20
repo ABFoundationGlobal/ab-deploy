@@ -1,37 +1,50 @@
+SHELL := /bin/bash
+
 gittagname := $(shell git describe --abbrev=0 --tags)
 gitcommit := $(shell  git rev-parse --short HEAD)
 versiondate := $(shell date +%Y%m%d%H%M%S)
 
-ifeq  ($(gittagname),)
+ifeq ($(origin VERSION), undefined)
+  ifneq ($(strip $(gittagname)),)
+    VERSION := $(gittagname)
+  else ifneq ($(strip $(gitcommit)),)
+    VERSION := $(gitcommit)
+  else
+    VERSION := $(versiondate)
+  endif
 else
-VERSION := $(if $(VERSION),$(VERSION),$(gittagname))
-endif
-ifeq ($(gitcommit),)
-else
-VERSION := $(if $(VERSION),$(VERSION)-$(gitcommit),$(gitcommit))
-endif
-ifeq ($(versiondate),)
-else
-VERSION := $(if $(VERSION),$(VERSION),$(versiondate))
+  ifneq ($(strip $(gitcommit)),)
+    VERSION := $(VERSION)-$(gitcommit)
+  endif
 endif
 
+.PHONY: all abcore-main abcore-test abiot-main abiot-test build_chain clean check
 
-all:	main test
-	@echo "${VERSION}: files under './build'."
+all: abcore-main abcore-test abiot-main abiot-test
 
-main:
-	echo ${VERSION}
-	bash build.sh ${VERSION} "mainnet"
-	@echo "Done mainnet building."
-	@echo "${VERSION}: run 'cd ./build/mainnet && sudo bash newchain.sh' to install mainnet."
+abcore-main:
+	@$(MAKE) build_chain CHAIN=abcore NETWORK=mainnet
 
-test:
-	bash build.sh ${VERSION} "testnet"
-	@echo "Done testnet building."
-	@echo "${VERSION}: run 'cd ./build/testnet && sudo bash newchain.sh' to install testnet."
+abcore-test:
+	@$(MAKE) build_chain CHAIN=abcore NETWORK=testnet
+
+abiot-main:
+	@$(MAKE) build_chain CHAIN=abiot NETWORK=mainnet
+
+abiot-test:
+	@$(MAKE) build_chain CHAIN=abiot NETWORK=testnet
+
+build_chain:
+	@echo "🔨 Building ${CHAIN} ${NETWORK}..."
+	@echo "Version: ${VERSION}"
+	@bash build.sh ${VERSION} "${CHAIN}" "${NETWORK}"
+	@echo "✅ Done: ${CHAIN} ${NETWORK} built."
+	@echo "👉 To install: run 'cd ./build/${CHAIN}/${NETWORK} && sudo bash newchain.sh'"
+	@echo
 
 clean:
 	rm -r build/
+	@echo "🧹 Cleaned build/ directory."
 
 check:
 	@[ "${VERSION}" ] && echo "VERSION is $(VERSION)" || ( echo "VERSION is not set"; exit 1 )

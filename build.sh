@@ -3,7 +3,7 @@
 set -eu
 
 # Use this script with Makefile.
-#   Example: USE_DOWNLOAD_ROOTURL=http://127.0.0.1 ./build.sh <tagname> <networkname>
+#   Example: ./build.sh <tagname> <abchain> <networkname>
 
 function color() {
     # Usage: color "31;5" "string"
@@ -14,31 +14,44 @@ function color() {
     printf '\033[%sm%s\033[0m\n' "$@"
 }
 
-if [ $# -eq 2 ]; then
+if [ $# -eq 3 ]; then
   version="$1"
-  networkname="$2"
+  abchain="$2"
+  networkname="$3"
 else
   color "31" "No args found or args len error, please run with 'make'."
 fi
 
-color "" "Current Network is ${networkname}"
+case "$abchain" in
+  abiot)
+    abchainname="AB IoT"
+    ;;
+  abcore)
+    abchainname="AB Core"
+    ;;
+  *)
+    echo "❌ Unknown chain: $abchain"
+    exit 1
+    ;;
+esac
+
+color "" "Current Network is ${abchainname} ${networkname}"
 
 version="$1"
 color "" "Current version is ${version}"
 
-mkdir -p build/${networkname}
-cd build/${networkname}
-tar czvf newchain-${networkname}-${version}.tar.gz -C ./../../ ${networkname}
-shasum -a 256 newchain-${networkname}-${version}.tar.gz > newchain-${networkname}-${version}.tar.gz.sha256
-cp ./../../newchain.sh newchain.sh
-sed  -i "s/newchain_deploy_latest_version=.*/newchain_deploy_latest_version='${version}'/" newchain.sh
-sed  -i "s/default_networkname=.*/default_networkname='${networkname}'/" newchain.sh
-if [[ -n ${USE_DOWNLOAD_ROOTURL:-} ]]; then
-  sed  -i "s,download_rooturl=.*,download_rooturl='${USE_DOWNLOAD_ROOTURL}'," newchain.sh
-fi
+mkdir -p build/${abchain}/${networkname}
+cd build/${abchain}/${networkname}
+tar czvf ${abchain}-${networkname}-${version}.tar.gz -C ../../../ ${abchain}/${networkname}
+shasum -a 256 ${abchain}-${networkname}-${version}.tar.gz > ${abchain}-${networkname}-${version}.tar.gz.sha256
 
-# handle newchain_mine.sh
-cp ./../../newchain-mine.sh newchain-mine.sh
-sed  -i "s/default_networkname=.*/default_networkname='${networkname}'/" newchain-mine.sh
+# update ab.sh
+cp ../../../ab.sh ab.sh
+perl -i -pe "s/ab_deploy_latest_version=.*/ab_deploy_latest_version='${version}'/" ab.sh
+perl -i -pe "s/default_ab_chain=.*/default_ab_chain='${abchain}'/" ab.sh
+perl -i -pe "s/default_networkname=.*/default_networkname='${networkname}'/" ab.sh
 
-
+# update ab-mine.sh
+cp ../../../ab-mine.sh ab-mine.sh
+perl -i -pe "s/default_ab_chain=.*/default_ab_chain='${abchain}'/" ab-mine.sh
+perl -i -pe "s/default_networkname=.*/default_networkname='${networkname}'/" ab-mine.sh

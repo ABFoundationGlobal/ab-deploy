@@ -1,4 +1,4 @@
-# NewChain node deployment guide
+# AB node deployment guide
 
 ## 1. System requirements
 
