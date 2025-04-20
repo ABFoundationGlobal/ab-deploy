@@ -8,11 +8,16 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write
+      actions: read
+      id-token: write
+
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout the code
+      uses: actions/checkout@v4
 
     - name: Build release files
       run: make
