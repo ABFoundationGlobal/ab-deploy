@@ -1,0 +1,25 @@
+name: Makefile CI
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build release files
+      run: make
+    
+    - name: Upload to GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: build/ab*
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
