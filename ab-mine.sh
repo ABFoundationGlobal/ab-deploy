@@ -73,7 +73,7 @@ ab_root_path="/data/ab"
 ab_chain_path="${ab_root_path}/${abchain}"
 ab_chain_network_path="${ab_chain_path}/${networkname}"
 
-if [[ $(${ab_chain_network_path}/bin/geth attach ${ab_chain_network_path}/nodedata/geth.ipc --exec eth.syncing) != "false" ]]; then
+if [[ $(${ab_chain_network_path}/bin/geth attach --exec eth.syncing ${ab_chain_network_path}/nodedata/geth.ipc) != "false" ]]; then
   color "31" "Please wait until your node synchronization is complete"
   exit 0
 else
