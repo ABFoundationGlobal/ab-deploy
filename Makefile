@@ -39,7 +39,7 @@ build_chain:
 	@echo "Version: ${VERSION}"
 	@bash build.sh ${VERSION} "${CHAIN}" "${NETWORK}"
 	@echo "✅ Done: ${CHAIN} ${NETWORK} built."
-	@echo "👉 To install: run 'cd ./build/${CHAIN}/${NETWORK} && sudo bash newchain.sh'"
+	@echo "👉 To install: run 'sudo bash ab.sh ${CHAIN} ${NETWORK}'"
 	@echo
 
 clean:

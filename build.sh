@@ -40,18 +40,18 @@ color "" "Current Network is ${abchainname} ${networkname}"
 version="$1"
 color "" "Current version is ${version}"
 
-mkdir -p build/${abchain}/${networkname}
-cd build/${abchain}/${networkname}
-tar czvf ${abchain}-${networkname}-${version}.tar.gz -C ../../../ ${abchain}/${networkname}
+mkdir -p build/
+cd build/
+tar czvf ${abchain}-${networkname}-${version}.tar.gz -C ../ ${abchain}/${networkname}
 shasum -a 256 ${abchain}-${networkname}-${version}.tar.gz > ${abchain}-${networkname}-${version}.tar.gz.sha256
 
-# update ab.sh
-cp ../../../ab.sh ab.sh
-perl -i -pe "s/ab_deploy_latest_version=.*/ab_deploy_latest_version='${version}'/" ab.sh
-perl -i -pe "s/default_ab_chain=.*/default_ab_chain='${abchain}'/" ab.sh
-perl -i -pe "s/default_networkname=.*/default_networkname='${networkname}'/" ab.sh
+# # update ab.sh
+# cp ../../../ab.sh ab.sh
+# perl -i -pe "s/ab_deploy_latest_version=.*/ab_deploy_latest_version='${version}'/" ab.sh
+# perl -i -pe "s/default_ab_chain=.*/default_ab_chain='${abchain}'/" ab.sh
+# perl -i -pe "s/default_networkname=.*/default_networkname='${networkname}'/" ab.sh
 
-# update ab-mine.sh
-cp ../../../ab-mine.sh ab-mine.sh
-perl -i -pe "s/default_ab_chain=.*/default_ab_chain='${abchain}'/" ab-mine.sh
-perl -i -pe "s/default_networkname=.*/default_networkname='${networkname}'/" ab-mine.sh
+# # update ab-mine.sh
+# cp ../../../ab-mine.sh ab-mine.sh
+# perl -i -pe "s/default_ab_chain=.*/default_ab_chain='${abchain}'/" ab-mine.sh
+# perl -i -pe "s/default_networkname=.*/default_networkname='${networkname}'/" ab-mine.sh
