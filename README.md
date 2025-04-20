@@ -29,10 +29,16 @@ mkdir -p ab && cd ab
 ```bash
 # AB Core Mainnet
 curl -fsSL https://raw.githubusercontent.com/ABFoundationGlobal/ab-deploy/main/ab.sh | sudo bash -s abcore mainnet
+```
+```bash
 # AB IoT Mainnet
 curl -fsSL https://raw.githubusercontent.com/ABFoundationGlobal/ab-deploy/main/ab.sh | sudo bash -s abiot mainnet
+```
+```bash
 # AB Core Testnet
 curl -fsSL https://raw.githubusercontent.com/ABFoundationGlobal/ab-deploy/main/ab.sh | sudo bash -s abcore testnet
+```
+```bash
 # AB IoT Testnet
 curl -fsSL https://raw.githubusercontent.com/ABFoundationGlobal/ab-deploy/main/ab.sh | sudo bash -s abiot testnet
 ```
@@ -42,10 +48,16 @@ curl -fsSL https://raw.githubusercontent.com/ABFoundationGlobal/ab-deploy/main/a
 ```bash
 # AB Core Mainnet
 sudo supervisorctl tail -f abcore stderr
+```
+```bash
 # AB IoT Mainnet
 sudo supervisorctl tail -f abiot stderr
+```
+```bash
 # AB Core Testnet
 sudo supervisorctl tail -f abcoretestnet stderr
+```
+```bash
 # AB IoT Testnet
 sudo supervisorctl tail -f abiottestnet stderr
 ```
@@ -61,10 +73,16 @@ sudo supervisorctl tail -f abiottestnet stderr
 ```bash
 # AB Core Mainnet
 sudo supervisorctl start abcore
+```
+```bash
 # AB IoT Mainnet
 sudo supervisorctl start abiot
+```
+```bash
 # AB Core Testnet
 sudo supervisorctl start abcoretestnet
+```
+```bash
 # AB IoT Testnet
 sudo supervisorctl start abiottestnet
 ```
@@ -74,10 +92,16 @@ sudo supervisorctl start abiottestnet
 ```bash
 # AB Core Mainnet
 sudo supervisorctl stop abcore
+```
+```bash
 # AB IoT Mainnet
 sudo supervisorctl stop abiot
+```
+```bash
 # AB Core Testnet
 sudo supervisorctl stop abcoretestnet
+```
+```bash
 # AB IoT Testnet
 sudo supervisorctl stop abiottestnet
 ```
