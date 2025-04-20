@@ -26,21 +26,16 @@ mkdir -p ab && cd ab
 
 ### 2.2 Fetch the `ab.sh` script run it
 
-For AB Core Mainnet:
-
 ```bash
-git clone https://github.com/ABFoundationGlobal/ab-deploy
-cd ab-deploy
-make
-cd abcore/build/mainnet
-sudo bash ab.sh
+# AB Core Mainnet
+curl -fsSL https://raw.githubusercontent.com/ABFoundationGlobal/ab-deploy/main/ab.sh | sudo bash -s abcore mainnet
+# AB IoT Mainnet
+curl -fsSL https://raw.githubusercontent.com/ABFoundationGlobal/ab-deploy/main/ab.sh | sudo bash -s abiot mainnet
+# AB Core Testnet
+curl -fsSL https://raw.githubusercontent.com/ABFoundationGlobal/ab-deploy/main/ab.sh | sudo bash -s abcore testnet
+# AB IoT Testnet
+curl -fsSL https://raw.githubusercontent.com/ABFoundationGlobal/ab-deploy/main/ab.sh | sudo bash -s abiot testnet
 ```
-
-for AB Core Testnet, `cd abcore/build/testnet && sudo bash ab.sh`
-
-for AB IoT Mainnet, `cd abiot/build/mainnet && sudo bash ab.sh`
-
-for AB IoT Testnet, `cd abcore/build/testnet && sudo bash ab.sh`
 
 ### 2.3 View AB nodes logs
 

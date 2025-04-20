@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -eu
 
@@ -6,7 +6,6 @@ set -eu
 # Use USE_AB_BLOCKCHAIN_VERSION to specify a specific release version.
 #   Example: USE_AB_BLOCKCHAIN_VERSION=v1.8.26 ./ab.sh
 
-ab_deploy_latest_version='v1.6.0'
 default_ab_chain="abcore"
 default_networkname='mainnet'
 
@@ -216,9 +215,7 @@ curl --silent -L "https://github.com/ABFoundationGlobal/${abchain}/releases/down
 # TODO: add gpg
 if test -f "$geth_file"; then
   sha256sum_res=$(shasum -a 256 -c "${geth_file}.sha256" | awk '{print $2}')
-  if [ "$sha256sum_res" == "OK" ]; then
-      color "32" "Verify $geth_file $sha256sum_res, checksum match."
-  else
+  if [ "$sha256sum_res" != "OK" ]; then
     download_geth_bin
   fi
 else
@@ -290,9 +287,7 @@ if [[ "$abchain" == "abiot" ]]; then
   curl --silent -L "https://github.com/newtonproject/newchain-guard/releases/download/${newchain_guard_version}/${guard_file}.sha256" -o "${guard_file}.sha256"
   if test -f "$guard_file"; then
     sha256sum_res=$(shasum -a 256 -c "${guard_file}.sha256" | awk '{print $2}')
-    if [ "$sha256sum_res" == "OK" ]; then
-        color "32" "Verify $guard_file $sha256sum_res, checksum match."
-    else
+    if [ "$sha256sum_res" != "OK" ]; then
       download_guard_bin
     fi
   else
@@ -321,13 +316,48 @@ fi
 ################## deploy files ##################
 # AB Deploy file
 color "" "################## deploy config files ##################"
+function get_ab_deploy_version() {
+    if [[ -n ${USE_AB_DEPLOY_VERSION:-} ]]; then
+        readonly deploy_reason="specified in \$USE_AB_DEPLOY_VERSION"
+        readonly ab_deploy_version="${USE_AB_DEPLOY_VERSION}"
+    else
+        # Find the latest AB nodes version available for download.
+        readonly deploy_reason="automatically selected latest available version"
+        ab_deploy_version="$(curl -s "https://api.github.com/repos/ABFoundationGlobal/ab-deploy/releases/latest" | grep '"tag_name":' | awk -F '"' '{print $4}')" || (color "31" "Get ${abname} deploy latest version error." && exit 1)
+        # if [[ "$networkname" == "testnet" ]]; then
+        #   ab_deploy_version="$(curl -s "https://api.github.com/repos/ABFoundationGlobal/ab-deploy/tags" | grep '"name":' | head -n 1 | awk -F '"' '{print $4}')" || (color "31" "Get ${abname} deploy latest version error." && exit 1)
+        # fi
+        readonly ab_deploy_version
+    fi
+}
+
+get_ab_deploy_version
+color "37" "Latest ${abname} deploy version is $ab_deploy_version."
+
+
+
 # get deploy files
-deploy_file="${abchain}-${networkname}-${ab_deploy_latest_version}.tar.gz"
-if [[ ! -f $deploy_file ]]; then
-    color "31" "No file ${deploy_file} found, please run 'make' first."
+deploy_file="${abchain}-${networkname}-${ab_deploy_version}.tar.gz"
+function download_deploy_file() {
+  color "34" "Downloading ${abname} deploy file of ${ab_deploy_version} to ${deploy_file} (${deploy_reason})"
+  github_url="https://github.com/ABFoundationGlobal/ab-deploy/releases/download/${ab_deploy_version}/${deploy_file}"
+  color "33" "Downloading from ${github_url}"
+  curl -L "${github_url}" -o "${deploy_file}" || {
+    color "31" "Failed to download the ${abname} deploy file."
     exit 1
+  }
+}
+
+curl --silent -L "https://github.com/ABFoundationGlobal/ab-deploy/releases/download/${ab_deploy_version}/${deploy_file}.sha256" -o "${deploy_file}.sha256"
+# TODO: add gpg
+if test -f "$deploy_file"; then
+  sha256sum_deploy_res=$(shasum -a 256 -c "${deploy_file}.sha256" | awk '{print $2}')
+  if [ "$sha256sum_deploy_res" != "OK" ]; then
+    download_deploy_file
+  fi
+else
+  download_deploy_file
 fi
-color "32" "${abname} installation package is up to date."
 
 color "37" "Trying to verify the installation file..."
 # TODO: add gpg
