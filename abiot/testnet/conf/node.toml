@@ -48,7 +48,7 @@ MinimumAcceptedPOW = 2e-01
 RestrictConnectionBetweenLightClients = true
 
 [Node]
-DataDir = "/data/ab/abiot/testnet/nodedata"
+DataDir = "/data/abiot/testnet/nodedata"
 NoUSB = true
 IPCPath = "geth.ipc"
 HTTPHost = "127.0.0.1"

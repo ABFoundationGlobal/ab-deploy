@@ -69,7 +69,7 @@ current_user="${SUDO_USER:-$(whoami)}"
 color "32" "Current user is $current_user"
 
 abname="${abchain} ${networkname}"
-ab_root_path="/data/ab"
+ab_root_path="/data"
 ab_chain_path="${ab_root_path}/${abchain}"
 ab_chain_network_path="${ab_chain_path}/${networkname}"
 

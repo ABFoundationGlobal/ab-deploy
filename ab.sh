@@ -104,8 +104,8 @@ color "32" "Current network is ${abchainname} ${networkname}"
 
 ################## system info ##################
 color "37" "Trying to check system info..."
-ab_root_path="/data/ab"
-ab_chain_path="${ab_root_path}/${abchain}"
+root_path="/data"
+ab_chain_path="${root_path}/${abchain}"
 ab_chain_network_path="${ab_chain_path}/${networkname}"
 mkdir -p ${ab_chain_network_path}
 work_size=$(du -s ${ab_chain_network_path} | awk '{print $1}')
@@ -377,11 +377,11 @@ if [[ -x ${ab_chain_network_path}/conf/guard.toml ]]; then
     mv ${ab_chain_network_path}/conf/guard.toml ${ab_chain_network_path}/conf/guard.${current_time}.toml
 fi
 # force extract deploy files
-tar zxf "$deploy_file" -C ${ab_root_path}  || {
-  color "31" "Failed to extract $deploy_file to ${ab_root_path}."
+tar zxf "$deploy_file" -C ${root_path}  || {
+  color "31" "Failed to extract $deploy_file to ${root_path}."
   exit 1
 }
-chown -R $sudo_user ${ab_root_path}
+chown -R $sudo_user ${root_path}
 sed -i "s/run_as_username/$sudo_user/g" ${ab_chain_network_path}/conf/node.toml
 
 if [[ ! -x ${ab_chain_network_path}/nodedata/geth/ ]]; then
