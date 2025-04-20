@@ -20,45 +20,70 @@ For server requirements, please refer to AWS r7a.large or r7i.large.
 
 ### 2.1 Create a working directory and enter it
 
-```
-mkdir -p newchain && cd newchain
+```bash
+mkdir -p ab && cd ab
 ```
 
-### 2.2 Fetch the `newchain.sh` script run it
+### 2.2 Fetch the `ab.sh` script run it
 
-For Mainnet:
+For AB Core Mainnet:
 
-```
-git clone https://github.com/newtonproject/newchain-deploy
-cd newchain-deploy
+```bash
+git clone https://github.com/ABFoundationGlobal/ab-deploy
+cd ab-deploy
 make
-cd build/mainnet
-sudo bash newchain.sh
+cd abcore/build/mainnet
+sudo bash ab.sh
 ```
 
-for Testnet, `cd build/testnet && sudo bash newchain.sh`
+for AB Core Testnet, `cd abcore/build/testnet && sudo bash ab.sh`
 
-### 2.3 View NewChain logs
+for AB IoT Mainnet, `cd abiot/build/mainnet && sudo bash ab.sh`
 
+for AB IoT Testnet, `cd abcore/build/testnet && sudo bash ab.sh`
+
+### 2.3 View AB nodes logs
+
+```bash
+# AB Core Mainnet
+sudo supervisorctl tail -f abcore stderr
+# AB IoT Mainnet
+sudo supervisorctl tail -f abiot stderr
+# AB Core Testnet
+sudo supervisorctl tail -f abcoretestnet stderr
+# AB IoT Testnet
+sudo supervisorctl tail -f abiottestnet stderr
 ```
-sudo supervisorctl tail -f newchain stderr
-```
 
-## 3. Use NewChain
+## 3. Use AB nodes
 
-- NewChain's external service port is port 8801, HTTP protocol, which can be used as an RPC interface in NewChain SDK.
+- AB nodes's external service port is port 8801, HTTP protocol, which can be used as an RPC interface in AB SDK.
 
 ## 4. Operation and maintenance related operations
 
-- Start NewChain:
+- Start AB nodes:
 
-```
-sudo supervisorctl start newchain
+```bash
+# AB Core Mainnet
+sudo supervisorctl start abcore
+# AB IoT Mainnet
+sudo supervisorctl start abiot
+# AB Core Testnet
+sudo supervisorctl start abcoretestnet
+# AB IoT Testnet
+sudo supervisorctl start abiottestnet
 ```
 
-- Stop NewChain：
+- Stop AB nodes:
 
-```
-sudo supervisorctl stop newchain
+```bash
+# AB Core Mainnet
+sudo supervisorctl stop abcore
+# AB IoT Mainnet
+sudo supervisorctl stop abiot
+# AB Core Testnet
+sudo supervisorctl stop abcoretestnet
+# AB IoT Testnet
+sudo supervisorctl stop abiottestnet
 ```
 
