@@ -23,7 +23,6 @@ RPCEVMTimeout = 5000000000
 RPCTxFeeCap = 10000.0
 
 [Eth.Miner]
-#Etherbase = "0x009f1ddaf7f528e60a7c560c51ae997cd4709cc3"
 GasFloor = 0
 GasCeil = 21000000
 GasPrice = 50000000000000

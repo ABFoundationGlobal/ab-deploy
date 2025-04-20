@@ -188,7 +188,7 @@ color "37" "Latest ${abname} version is $ab_version."
 ab_version_file="geth.${ab_version}"
 
 if [[ -f ${ab_chain_network_path}/bin/${ab_version_file} ]]; then
-    color "32" "${abname} is up to date."
+    color "32" "${abchainname} ${networkname} is up to date."
     if [[ "$(realpath ${ab_chain_network_path}/bin/geth)" != "${ab_chain_network_path}/bin/${ab_version_file}" ]]; then
       ln -sf "${ab_version_file}" ${ab_chain_network_path}/bin/geth
       color "37" "Updated ${abname} binary link."
@@ -329,7 +329,7 @@ if [[ ! -f $deploy_file ]]; then
 fi
 color "32" "${abname} installation package is up to date."
 
-color "37" "Trying to the installation file..."
+color "37" "Trying to verify the installation file..."
 # TODO: add gpg
 sha256sum_deploy_res=$(shasum -a 256 -c "${deploy_file}.sha256" | awk '{print $2}')
 if [ "$sha256sum_deploy_res" == "OK" ]; then
