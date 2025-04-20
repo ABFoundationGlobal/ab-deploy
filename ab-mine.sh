@@ -121,6 +121,7 @@ current_time=$(date +"%Y%m%d%H%M%S")
 # node.toml: disable rpc
 cp ${ab_chain_network_path}/conf/node.toml ${ab_chain_network_path}/conf/node.bak.${current_time}.toml
 sudo perl -i -pe "s,HTTPHost.*,HTTPHost = \"\"," ${ab_chain_network_path}/conf/node.toml
+sudo perl -i -pe "s,WSHost.*,WSHost = \"\"," ${ab_chain_network_path}/conf/node.toml
 
 # Supervisor: update command to enable mine
 ab_program_name="${abchain}"
@@ -128,7 +129,7 @@ if [[ "$networkname" == "testnet" ]]; then
   ab_program_name="${abchain}${networkname}"
 fi
 cp /etc/supervisor/conf.d/${ab_program_name}.conf ${ab_chain_network_path}/supervisor/${ab_program_name}.bak.${current_time}.conf
-sudo sed  -i "s,command=.*,command=${ab_chain_network_path}/bin/geth --config ${ab_chain_network_path}/conf/node.toml --mine --unlock ${address} --password ${ab_chain_network_path}/password.txt --miner.gastarget 100000000," /etc/supervisor/conf.d/${ab_program_name}.conf
+sudo sed  -i "s,command=.*,command=${ab_chain_network_path}/bin/geth --config ${ab_chain_network_path}/conf/node.toml --mine --unlock ${address} --password ${ab_chain_network_path}/password.txt," /etc/supervisor/conf.d/${ab_program_name}.conf
 
 # Guard: disable AB IoT guard
 if [[ "$networkname" == "testnet" ]]; then
