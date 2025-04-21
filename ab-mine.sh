@@ -81,10 +81,8 @@ else
 fi
 
 # Trying to get current miner address if exits
-address=$(${ab_chain_network_path}/bin/geth attach ${ab_chain_network_path}/nodedata/geth.ipc --exec eth.coinbase | sed 's/\"//g')
-if [[ ${address} != 0x* || ${#address} < 42 ]]; then
-  # Account
-  color "" "Create new password for your miner's keystore."
+function create_new_address() {
+ color "" "Create new password for your miner's keystore."
   color "" "Your new account is locked with a password. Please give a password. Do not forget this password."
   echo -n "Password: "
   read -s password0
@@ -108,18 +106,33 @@ if [[ ${address} != 0x* || ${#address} < 42 ]]; then
   chown $current_user:$current_user ${ab_chain_network_path}/password.txt
 
   # ${ab_chain_network_path}/bin/geth --config ${ab_chain_network_path}/conf/node.toml account new --password ${ab_chain_network_path}/password.txt
-  address=$(sudo -u ${current_user} ${ab_chain_network_path}/bin/geth --config ${ab_chain_network_path}/conf/node.toml account new --password ${ab_chain_network_path}/password.txt | grep "Public address" | awk '{print $6}')
-  echo "you miner address is: |${address}|"
-  if [[ ${address} != 0x* || ${#address} < 42 ]]; then
+  newaddress=$(sudo -u ${current_user} ${ab_chain_network_path}/bin/geth --config ${ab_chain_network_path}/conf/node.toml account new --password ${ab_chain_network_path}/password.txt | grep "Public address" | awk '{print $6}')
+  echo "you miner address is: |${newaddress}|"
+  if [[ ${newaddress} != 0x* || ${#newaddress} < 42 ]]; then
     color "31" "address len error"
     exit 1
   fi
   color "32" "Your miner address keystore is under ${ab_chain_network_path}/nodedata， please backup it."
+}
+accounts_len=$(${ab_chain_network_path}/bin/geth attach --exec 'eth.accounts.length' ${ab_chain_network_path}/nodedata/geth.ipc)
+if [[ ${accounts_len} -lt 1 ]]; then
+  create_new_address
 fi
+address=$(${ab_chain_network_path}/bin/geth attach --exec eth.coinbase ${ab_chain_network_path}/nodedata/geth.ipc| perl -pe 's/\"//g')
+if [[ ${address} != 0x* || ${#address} < 42 ]]; then
+  address=$(${ab_chain_network_path}/bin/geth attach --exec 'eth.accounts[0]' ${ab_chain_network_path}/nodedata/geth.ipc| perl -pe 's/\"//g')
+fi
+if [[ ${address} != 0x* || ${#address} < 42 ]]; then
+  color "31" "failed to get address"
+  exit 1
+fi
+color "32" "The miner address used is ${address}."
 
 current_time=$(date +"%Y%m%d%H%M%S")
 # node.toml: disable rpc
 cp ${ab_chain_network_path}/conf/node.toml ${ab_chain_network_path}/conf/node.bak.${current_time}.toml
+sudo perl -i -pe "s,NoPruning.*,NoPruning = false," ${ab_chain_network_path}/conf/node.toml
+sudo perl -i -pe "s,Preimages.*,Preimages = false," ${ab_chain_network_path}/conf/node.toml
 sudo perl -i -pe "s,HTTPHost.*,HTTPHost = \"\"," ${ab_chain_network_path}/conf/node.toml
 sudo perl -i -pe "s,WSHost.*,WSHost = \"\"," ${ab_chain_network_path}/conf/node.toml
 
@@ -129,11 +142,13 @@ if [[ "$networkname" == "testnet" ]]; then
   ab_program_name="${abchain}${networkname}"
 fi
 cp /etc/supervisor/conf.d/${ab_program_name}.conf ${ab_chain_network_path}/supervisor/${ab_program_name}.bak.${current_time}.conf
-sudo sed  -i "s,command=.*,command=${ab_chain_network_path}/bin/geth --config ${ab_chain_network_path}/conf/node.toml --mine --unlock ${address} --password ${ab_chain_network_path}/password.txt," /etc/supervisor/conf.d/${ab_program_name}.conf
+sudo perl -i -pe "s,command=.*,command=${ab_chain_network_path}/bin/geth --config ${ab_chain_network_path}/conf/node.toml --mine --unlock ${address} --password ${ab_chain_network_path}/password.txt," /etc/supervisor/conf.d/${ab_program_name}.conf
 
 # Guard: disable AB IoT guard
-if [[ "$networkname" == "testnet" ]]; then
-  sudo mv /etc/supervisor/conf.d/${ab_program_name}guard.conf ${ab_chain_network_path}/supervisor/${ab_program_name}uard.bak.${current_time}.conf
+if [[ "$abchain" == "abiot" ]]; then
+  if sudo test -e "/etc/supervisor/conf.d/${ab_program_name}guard.conf"; then
+    sudo mv /etc/supervisor/conf.d/${ab_program_name}guard.conf ${ab_chain_network_path}/supervisor/${ab_program_name}guard.bak.${current_time}.conf
+  fi
 fi
 
 sudo supervisorctl update
