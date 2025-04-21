@@ -63,8 +63,11 @@ sudo supervisorctl tail -f abiottestnet stderr
 ```
 
 ## 3. Use AB nodes
-
-- AB nodes's external service port is port 8801, HTTP protocol, which can be used as an RPC interface in AB SDK.
+  
+| Network | RPC Port           | P2P Port      | notes |
+| ------- | ------------------ | ------------- | ----- |
+| AB Core | http 8545, ws 8546 | tcp/udp 33333 |       |
+| AB IoT  | http 8801          | tcp/udp 38311 |       |
 
 ## 4. Operation and maintenance related operations
 
