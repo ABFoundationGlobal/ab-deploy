@@ -106,9 +106,9 @@ function create_new_address() {
   chown $current_user:$current_user ${ab_chain_network_path}/password.txt
 
   # ${ab_chain_network_path}/bin/geth --config ${ab_chain_network_path}/conf/node.toml account new --password ${ab_chain_network_path}/password.txt
-  newaddress=$(sudo -u ${current_user} ${ab_chain_network_path}/bin/geth --config ${ab_chain_network_path}/conf/node.toml account new --password ${ab_chain_network_path}/password.txt | grep "Public address" | awk '{print $6}')
-  echo "you miner address is: |${newaddress}|"
-  if [[ ${newaddress} != 0x* || ${#newaddress} < 42 ]]; then
+  address=$(sudo -u ${current_user} ${ab_chain_network_path}/bin/geth --config ${ab_chain_network_path}/conf/node.toml account new --password ${ab_chain_network_path}/password.txt | grep "Public address" | awk '{print $6}')
+  echo "you miner address is: |${address}|"
+  if [[ ${address} != 0x* || ${#address} < 42 ]]; then
     color "31" "address len error"
     exit 1
   fi
@@ -117,11 +117,13 @@ function create_new_address() {
 accounts_len=$(${ab_chain_network_path}/bin/geth attach --exec 'eth.accounts.length' ${ab_chain_network_path}/nodedata/geth.ipc)
 if [[ ${accounts_len} -lt 1 ]]; then
   create_new_address
+else
+  address=$(${ab_chain_network_path}/bin/geth attach --exec eth.coinbase ${ab_chain_network_path}/nodedata/geth.ipc| perl -pe 's/\"//g')
+  if [[ ${address} != 0x* || ${#address} < 42 ]]; then
+    address=$(${ab_chain_network_path}/bin/geth attach --exec 'eth.accounts[0]' ${ab_chain_network_path}/nodedata/geth.ipc| perl -pe 's/\"//g')
+  fi
 fi
-address=$(${ab_chain_network_path}/bin/geth attach --exec eth.coinbase ${ab_chain_network_path}/nodedata/geth.ipc| perl -pe 's/\"//g')
-if [[ ${address} != 0x* || ${#address} < 42 ]]; then
-  address=$(${ab_chain_network_path}/bin/geth attach --exec 'eth.accounts[0]' ${ab_chain_network_path}/nodedata/geth.ipc| perl -pe 's/\"//g')
-fi
+
 if [[ ${address} != 0x* || ${#address} < 42 ]]; then
   color "31" "failed to get address"
   exit 1
@@ -142,7 +144,7 @@ if [[ "$networkname" == "testnet" ]]; then
   ab_program_name="${abchain}${networkname}"
 fi
 cp /etc/supervisor/conf.d/${ab_program_name}.conf ${ab_chain_network_path}/supervisor/${ab_program_name}.bak.${current_time}.conf
-sudo perl -i -pe "s,command=.*,command=${ab_chain_network_path}/bin/geth --config ${ab_chain_network_path}/conf/node.toml --mine --unlock ${address} --password ${ab_chain_network_path}/password.txt," /etc/supervisor/conf.d/${ab_program_name}.conf
+sudo perl -i -pe "s,command=.*,command=${ab_chain_network_path}/bin/geth --config ${ab_chain_network_path}/conf/node.toml --mine --unlock ${address} --password ${ab_chain_network_path}/password.txt --miner.etherbase ${address}," /etc/supervisor/conf.d/${ab_program_name}.conf
 
 # Guard: disable AB IoT guard
 if [[ "$abchain" == "abiot" ]]; then
