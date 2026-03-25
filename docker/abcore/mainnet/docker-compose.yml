@@ -1,0 +1,33 @@
+services:
+  abcore-init:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        ABCHAIN: abcore
+        NETWORK: mainnet
+        USE_AB_BLOCKCHAIN_VERSION: ${USE_AB_BLOCKCHAIN_VERSION:-}
+        USE_AB_DEPLOY_VERSION: ${USE_AB_DEPLOY_VERSION:-}
+    volumes:
+      - /data:/data
+    entrypoint: ["/bin/bash", "/opt/ab/ab.sh", "init"]
+
+  abcore-mainnet:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        ABCHAIN: abcore
+        NETWORK: mainnet
+        USE_AB_BLOCKCHAIN_VERSION: ${USE_AB_BLOCKCHAIN_VERSION:-}
+        USE_AB_DEPLOY_VERSION: ${USE_AB_DEPLOY_VERSION:-}
+    container_name: abcore-mainnet
+    restart: unless-stopped
+    volumes:
+      - /data:/data
+    ports:
+      - "8545:8545"
+      - "8546:8546"
+      - "33333:33333/tcp"
+      - "33333:33333/udp"
+    entrypoint: ["/bin/bash", "/opt/ab/ab.sh", "run"]
