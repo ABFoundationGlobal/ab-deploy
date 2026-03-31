@@ -246,23 +246,23 @@ if [[ "$abchain" == "abiot" ]]; then
   function get_abiot_guard_version() {
       if [[ -n ${USE_AB_GUARD_VERSION:-} ]]; then
           readonly guard_reason="specified in \$USE_AB_GUARD_VERSION"
-          readonly newchain_guard_version="${USE_AB_GUARD_VERSION}"
+          readonly abiot_guard_version="${USE_AB_GUARD_VERSION}"
       else
           # Find the latest AB IoT Guard version available for download.
           readonly guard_reason="automatically selected latest available version"
-          newchain_guard_version="$(curl -s "https://api.github.com/repos/newtonproject/newchain-guard/releases/latest" | grep '"tag_name":' | awk -F '"' '{print $4}')" || (color "31" "Get ${abchainname} Guard latest version error." && exit 1)
-          readonly newchain_guard_version
+          abiot_guard_version="$(curl -s "https://release.ab.org/guard/latest")" || (color "31" "Get ${abchainname} Guard latest version error." && exit 1)
+          readonly abiot_guard_version
       fi
   }
 
   get_abiot_guard_version
-  color "37" "Latest ${abchainname} Guard version is ${newchain_guard_version}."
+  color "37" "Latest ${abchainname} Guard version is ${abiot_guard_version}."
 
-  newchian_guard_network_file="guard.${newchain_guard_version}"
-  if [[ -f ${ab_chain_network_path}/bin/${newchian_guard_network_file} ]]; then
+  abiot_guard_network_file="guard.${abiot_guard_version}"
+  if [[ -f ${ab_chain_network_path}/bin/${abiot_guard_network_file} ]]; then
       color "32" "${abchainname} Guard is up to date."
-      if [[ "$(realpath ${ab_chain_network_path}/bin/guard)" != "${ab_chain_network_path}/bin/${newchian_guard_network_file}" ]]; then
-        ln -sf "${newchian_guard_network_file}" ${ab_chain_network_path}/bin/guard
+      if [[ "$(realpath ${ab_chain_network_path}/bin/guard)" != "${ab_chain_network_path}/bin/${abiot_guard_network_file}" ]]; then
+        ln -sf "${abiot_guard_network_file}" ${ab_chain_network_path}/bin/guard
         color "37" "Updated ${abchainname} Guard binary link."
         # supervisorctl restart ${ab_program_name}guard || {
         #   color "31" "Failed to restart ${abchainname} guard by supervisor."
@@ -273,18 +273,18 @@ if [[ "$abchain" == "abiot" ]]; then
       # exit 0 # not now
   fi
 
-  guard_file="newchain-guard-${newchain_guard_version}"
+  guard_file="abiot-guard-${abiot_guard_version}"
   function download_guard_bin() {
-    color "34" "Downloading NewChainGuard@${newchain_guard_version} binary to ${guard_file}"
-    github_url="https://github.com/newtonproject/newchain-guard/releases/download/${newchain_guard_version}/${guard_file}"
+    color "34" "Downloading ABIoTGuard@${abiot_guard_version} binary to ${guard_file}"
+    github_url="https://release.ab.org/guard/${guard_file}"
     color "33" "Downloading from ${github_url}"
     curl -L "${github_url}" -o $guard_file || {
-      color "31" "Failed to download the NewChain Guard binary."
+      color "31" "Failed to download the AB IoT Guard binary."
       exit 1
     }
   }
 
-  curl --silent -L "https://github.com/newtonproject/newchain-guard/releases/download/${newchain_guard_version}/${guard_file}.sha256" -o "${guard_file}.sha256"
+  curl --silent -L "https://release.ab.org/guard/${guard_file}.sha256" -o "${guard_file}.sha256"
   if test -f "$guard_file"; then
     sha256sum_res=$(shasum -a 256 -c "${guard_file}.sha256" | awk '{print $2}')
     if [ "$sha256sum_res" != "OK" ]; then
@@ -305,9 +305,9 @@ if [[ "$abchain" == "abiot" ]]; then
   fi
 
   chmod +x $guard_file
-  cp $guard_file ${ab_chain_network_path}/bin/${newchian_guard_network_file}
-  ln -sf "${newchian_guard_network_file}" ${ab_chain_network_path}/bin/guard || {
-    color "31" "Failed to link $newchian_guard_network_file to guard."
+  cp $guard_file ${ab_chain_network_path}/bin/${abiot_guard_network_file}
+  ln -sf "${abiot_guard_network_file}" ${ab_chain_network_path}/bin/guard || {
+    color "31" "Failed to link $abiot_guard_network_file to guard."
     exit 1
   }
   color "37" "Updated ${abchainname} Guard binary link."
