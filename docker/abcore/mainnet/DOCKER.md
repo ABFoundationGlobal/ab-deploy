@@ -25,7 +25,20 @@ docker compose run --rm abcore-init
 docker compose down
 ```
 
+## Upgrade
+
+By default, this Docker flow uses the versions defined during image build. 
+To upgrade the node binary or deploy package, rebuild the image and restart the service:
+
+```bash
+docker compose build --no-cache
+docker compose up -d abcore-mainnet
+docker compose logs -f abcore-mainnet
+```
+
 ## Optional Version Pinning
+
+You can pin specific versions during build time:
 
 ```bash
 USE_AB_BLOCKCHAIN_VERSION=v1.13.15-abcore-1.1 \
