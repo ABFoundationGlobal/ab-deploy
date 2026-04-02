@@ -107,3 +107,20 @@ sudo supervisorctl stop abcoretestnet
 sudo supervisorctl stop abiottestnet
 ```
 
+- Upgrade geth only
+
+```bash
+# AB Core Mainnet
+curl -fsSL https://raw.githubusercontent.com/ABFoundationGlobal/ab-deploy/main/ab-geth-upgrade.sh | sudo bash -s abcore mainnet
+```
+```bash
+# AB Core Testnet
+curl -fsSL https://raw.githubusercontent.com/ABFoundationGlobal/ab-deploy/main/ab-geth-upgrade.sh | sudo bash -s abcore testnet
+```
+
+To upgrade to a specific geth version:
+
+```bash
+# Example: AB Core Mainnet
+curl -fsSL https://raw.githubusercontent.com/ABFoundationGlobal/ab-deploy/main/ab-geth-upgrade.sh | sudo USE_AB_BLOCKCHAIN_VERSION=v1.13.15-abcore-1.1 bash -s abcore mainnet
+```
